@@ -5,10 +5,10 @@ namespace BookCatalog.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BookController : ControllerBase
+    public class BooksController : ControllerBase
     {
-        private readonly ILogger<BookController> _logger;
-        public BookController(ILogger<BookController> logger)
+        private readonly ILogger<BooksController> _logger;
+        public BooksController(ILogger<BooksController> logger)
         {
             _logger = logger;
         }
