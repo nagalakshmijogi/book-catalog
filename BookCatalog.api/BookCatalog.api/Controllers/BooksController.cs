@@ -1,4 +1,6 @@
-﻿using BookCatalog.api.Models;
+﻿using BookCatalog.Common.Interfaces.Services;
+using BookCatalog.Common.Models.Dtos.Requests;
+using BookCatalog.Common.Models.Dtos.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookCatalog.api.Controllers
@@ -8,17 +10,18 @@ namespace BookCatalog.api.Controllers
     public class BooksController : ControllerBase
     {
         private readonly ILogger<BooksController> _logger;
-        public BooksController(ILogger<BooksController> logger)
+        private readonly IBookService _bookService;
+        public BooksController(IBookService bookService, ILogger<BooksController> logger)
         {
+            _bookService = bookService;
             _logger = logger;
         }
 
-        private static List<Book> books = new List<Book>();
-
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public ActionResult<List<Book>> GetBooks()
+        public ActionResult<List<BookResponse>> GetBooks()
         {
+            var books = _bookService.GetAll();
             _logger.LogInformation("Retrieved all books. Count: {Count}", books.Count);
             return books;
         }
@@ -26,9 +29,9 @@ namespace BookCatalog.api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
-        public ActionResult<Book> GetBook(int id)
+        public ActionResult<BookResponse> GetBook(int id)
         {
-            var book = books.FirstOrDefault(b => b.Id == id);
+            var book = _bookService.Get(id);
 
             if (book == null)
             {
@@ -42,51 +45,47 @@ namespace BookCatalog.api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        public ActionResult<Book> CreateBook(Book book)
+        public ActionResult<BookResponse> CreateBook(CreateBookRequest bookRequest)
         {
             try
             {
-                book.Id = books.Count + 1;
-                books.Add(book);
-                _logger.LogInformation("Book created successfully. Id: {Id}", book.Id);
-                return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
+                var bookResponse = _bookService.Create(bookRequest);
+                _logger.LogInformation("Book created successfully. Id: {Id}", bookResponse.Id);
+                return CreatedAtAction(nameof(GetBook), new { id = bookResponse.Id }, bookResponse);
             }
-            
+
             catch (Exception ex)
             {
-                _logger.LogError( ex,"An error occurred while creating the book.");
-                 return StatusCode(StatusCodes.Status500InternalServerError,"An unexpected error occurred while creating the book.");
+                _logger.LogError(ex, "An error occurred while creating the book.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred while creating the book.");
             }
         }
 
-            
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpPut("{id}")]
-        public ActionResult<Book> UpdateBook(int id, Book updatedBook)
+        [HttpPut()]
+        public ActionResult<BookResponse> UpdateBook(UpdateBookRequest updateBook)
         {
             try
             {
-                var book = books.FirstOrDefault(b => b.Id == id);
+                var bookResponse = _bookService.Update(updateBook);
 
-                if (book == null)
+                if (bookResponse == null)
                 {
-                    _logger.LogWarning("Book with Id {Id} was not found for update.", id);
+                    _logger.LogWarning("Book with Id {Id} was not found for update.", updateBook.Id);
                     return NotFound();
                 }
 
-                book.Title = updatedBook.Title;
-                book.Author = updatedBook.Author;
-                book.PublishedYear = updatedBook.PublishedYear;
-                _logger.LogInformation("Book with Id {Id} updated successfully.", id);
-                return book;
+                _logger.LogInformation("Book with Id {Id} updated successfully.", updateBook.Id);
+                return bookResponse;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while updating the book with Id {Id}.", id);
-                 return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred while updating the book.");
+                _logger.LogError(ex, "An error occurred while updating the book with Id {Id}.", updateBook.Id);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred while updating the book.");
             }
         }
 
@@ -98,16 +97,15 @@ namespace BookCatalog.api.Controllers
         {
             try
             {
-                var book = books.FirstOrDefault(b => b.Id == id);
+                var result = _bookService.Delete(id);
 
-                if (book == null)
+                if (!result)
                 {
 
                     _logger.LogWarning("Book with Id {Id} was not found for deletion.", id);
                     return NotFound();
                 }
 
-                books.Remove(book);
                 _logger.LogInformation("Book with Id {Id} deleted successfully.", id);
                 return NoContent();
             }
