@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BookCatalog.Common.Models.Dtos.Requests
 {
@@ -9,10 +6,8 @@ namespace BookCatalog.Common.Models.Dtos.Requests
     {
         [Required]
         public string Title { get; set; } = string.Empty;
-
         [Required]
         public string Author { get; set; } = string.Empty;
-
         [Range(1000, 2026)]
         public int PublishedYear { get; set; }
     }
