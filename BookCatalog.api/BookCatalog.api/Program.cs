@@ -3,6 +3,7 @@ using BookCatalog.BusinessLogicLayer.Repositories;
 using BookCatalog.BusinessLogicLayer.Services;
 using BookCatalog.Common.Interfaces.Repositories;
 using BookCatalog.Common.Interfaces.Services;
+using BookCatalog.api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

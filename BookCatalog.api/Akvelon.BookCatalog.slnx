@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="BookCatalog.api/BookCatalog.api.csproj" DisplayName="BookCatalog.Api" />
+  <Project Path="BookCatalog.api/BookCatalog.api.csproj" />
   <Project Path="BookCatalog.BusinessLogic/BookCatalog.BusinessLogicLayer.csproj" Id="5bc030ff-19cd-477f-8c9d-15319f0c1ac7" />
   <Project Path="BookCatalog.Common/BookCatalog.Common.csproj" Id="db547921-1489-4396-9b44-dca2b36d62ed" />
   <Project Path="BookCatalog.DataLayer/BookCatalog.DataLayer.csproj" Id="a21b2ce5-7cfb-47bb-b9d1-df7430310a11" />
+  <Project Path="BookCatalog.Tests/BookCatalog.Tests.csproj" Id="39e2491c-1656-475b-aaff-b06db547d62a" />
 </Solution>
